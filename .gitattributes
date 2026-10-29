@@ -13,3 +13,8 @@ Dockerfile text eol=lf
 # SQL migrations are checksummed into the ledger. Keep them LF so a Windows and a
 # Linux checkout produce identical bytes.
 *.sql text eol=lf
+
+# Presentation packages and rendered media must preserve their exact bytes.
+*.pptx binary
+*.pdf binary
+*.png binary

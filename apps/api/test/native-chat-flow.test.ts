@@ -12,6 +12,8 @@ import { createTokenCipher } from '../src/integrations/amocrm/crypto.ts';
 import { drainAmocrmReplies } from '../src/integrations/amocrm/replies.ts';
 import { runSendWorker } from '../src/telegram/send.ts';
 import { signedWebhook } from './helpers/amocrm.ts';
+import { createOutboundMediaResolver } from '../src/integrations/amocrm/outbound-media.ts';
+import type { TelegramTransport } from '../src/telegram/transport.ts';
 
 async function fixture() {
   const testDb = await createTestDb();
@@ -249,4 +251,80 @@ test('native quotes resolve only confirmed ids in the same dialog and outgoing m
   assert.equal((await drainAmocrmReplies(db,{schema,outboundEnabled:true})).review,1);
   assert.equal((await db.query("SELECT count(*)::int AS n FROM send_operations WHERE idempotency_key='amocrm:acc_conn1:missing-quote'")).rows[0].n,0);
  }finally{await close();}
+});
+
+for (const type of ['picture','file'] as const) test(`native ${type} sends the original attachment once and persists attachment history`,async()=>{
+  const c=await fixture();try{
+    const bytes=type==='picture'?Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,1,2]):Buffer.from('original document bytes');
+    const name=type==='picture'?'Тест.png':'Тест.txt';let uploads=0,downloads=0,linked=false,sends=0,leadLookups=0;
+    const resolver=createOutboundMediaResolver({db:c.db,schema:c.schema,
+      getAccessToken:async()=>{throw Error('OAuth must not go to amojo attachment host');},
+      resolveLead:async input=>{leadLookups++;assert.equal(input.contactId,'77');return '500';},
+      fetch:async(url,init)=>{downloads++;assert.equal(url,'https://amojo.amocrm.ru/attachments/synthetic');assert.deepEqual(init?.headers,{});return new Response(bytes);},
+      files:{upload:async input=>{uploads++;assert.deepEqual(input.bytes,new Uint8Array(bytes));assert.equal(input.fileName,name);return {uuid:'11111111-1111-4111-8111-111111111111'};},
+        isLinked:async()=>linked,link:async input=>{assert.equal(input.leadId,'500');linked=true;}},
+      reader:{download:async input=>{assert.equal(input.byteSize,bytes.length);return new Uint8Array(bytes);}}});
+    const payload={type,text:'test caption',media:'https://amojo.amocrm.ru/attachments/synthetic',file_name:name,file_size:bytes.length};
+    assert.equal((await c.webhook('native-media',payload)).statusCode,200);
+    await c.webhook('native-media',payload);
+    assert.equal((await drainAmocrmReplies(c.db,{schema:c.schema,outboundEnabled:true})).queued,1);
+    const options={...c.scope,schema:c.schema,owner:'media-test',leaseMs:60000,resolveMedia:resolver,
+      transport:{sendMessage:async()=>{throw Error('no caption-only send');},sendMedia:async (input:Parameters<NonNullable<TelegramTransport['sendMedia']>>[0])=>{
+        sends++;assert.equal(input.chatId,'12345');assert.equal(input.mediaType,type==='picture'?'photo':'document');
+        assert.equal(input.caption,'test caption');assert.equal(input.file.fileName,name);assert.deepEqual(input.file.bytes,new Uint8Array(bytes));
+        return {outcome:'sent' as const,providerMessageId:'101'};}}};
+    assert.equal((await runSendWorker(c.db,options)).sent,1);
+    assert.equal((await runSendWorker(c.db,options)).claimed,0);
+    assert.equal(sends,1);assert.equal(uploads,1);assert.equal(downloads,1);assert.equal(leadLookups,1);
+    const stored=(await c.db.query("SELECT v.content FROM messages m JOIN message_versions v ON v.company_id=m.company_id AND v.message_id=m.id WHERE m.direction='out'")).rows[0].content;
+    assert.equal(stored.kind,'attachment');assert.equal(stored.outboundMedia.fileName,name);assert.equal(stored.outboundMedia.sizeBytes,bytes.length);
+    assert.equal(JSON.stringify(stored).includes('https://'),false);
+    assert.equal((await c.db.query('SELECT state FROM amocrm_outbound_files')).rows[0].state,'linked');
+    assert.equal((await c.db.query('SELECT lead_id FROM crm_bindings')).rows[0].lead_id,null,'lead discovery is read-only');
+  }finally{await c.close();}
+});
+
+for(const revoke of ["UPDATE connections SET send_enabled=false","UPDATE connections SET crm_access_enabled=true"])test(`media rechecks current access after slow file preparation: ${revoke}`,async()=>{
+  const c=await fixture();try{
+    await c.webhook('revoked-media',{type:'file',media:'https://amojo.amocrm.ru/attachments/synthetic',file_name:'test.txt',file_size:4});
+    assert.equal((await drainAmocrmReplies(c.db,{schema:c.schema,outboundEnabled:true})).queued,1);
+    let calls=0;
+    const result=await runSendWorker(c.db,{...c.scope,schema:c.schema,owner:'revocation',leaseMs:60000,
+      resolveMedia:async()=>{await c.db.query(revoke);return {bytes:Buffer.from('test'),fileName:'test.txt',mimeType:'text/plain'};},
+      transport:{sendMessage:async()=>{throw Error('no text');},sendMedia:async()=>{calls++;return {outcome:'sent',providerMessageId:'101'};}}});
+    assert.equal(result.failed,1);assert.equal(calls,0);
+  }finally{await c.close();}
+});
+
+test('an ambiguous Telegram attachment send is terminal and never blindly retried',async()=>{
+  const c=await fixture();try{
+    await c.webhook('uncertain-media',{type:'file',media:'https://amojo.amocrm.ru/attachments/synthetic',file_name:'test.txt',file_size:4});
+    await drainAmocrmReplies(c.db,{schema:c.schema,outboundEnabled:true});
+    let calls=0,prepares=0;
+    const options={...c.scope,schema:c.schema,owner:'uncertain',leaseMs:60000,
+      resolveMedia:async()=>{prepares++;return {bytes:Buffer.from('test'),fileName:'test.txt',mimeType:'text/plain'};},
+      transport:{sendMessage:async()=>{throw Error('no text');},sendMedia:async()=>{calls++;return {outcome:'unknown' as const,reason:'timeout' as const};}}};
+    assert.equal((await runSendWorker(c.db,options)).unknown,1);assert.equal((await runSendWorker(c.db,options)).claimed,0);
+    assert.equal(calls,1);assert.equal(prepares,1);
+  }finally{await c.close();}
+});
+
+test('an unconfirmed CRM byte upload is recorded without any Telegram delivery or blind reupload',async()=>{
+  const c=await fixture();try{
+    await c.db.query("UPDATE crm_bindings SET lead_id='500'");
+    await c.webhook('failed-upload',{type:'file',media:'https://amojo.amocrm.ru/attachments/synthetic',file_name:'test.txt',file_size:4});
+    await drainAmocrmReplies(c.db,{schema:c.schema,outboundEnabled:true});
+    let uploads=0,sends=0;
+    const resolver=createOutboundMediaResolver({db:c.db,schema:c.schema,getAccessToken:async()=>'',fetch:async()=>new Response('test'),
+      files:{upload:async()=>{uploads++;throw Error('synthetic uncertain upload');},isLinked:async()=>false,link:async()=>{throw Error('no link');}},
+      reader:{download:async()=>{throw Error('no read');}}});
+    const result=await runSendWorker(c.db,{...c.scope,schema:c.schema,owner:'failed-upload',leaseMs:60000,resolveMedia:resolver,
+      transport:{sendMessage:async()=>{throw Error('no text');},sendMedia:async()=>{sends++;return {outcome:'sent',providerMessageId:'101'};}}});
+    assert.equal(result.failed,1);assert.equal(sends,0);assert.equal(uploads,1);
+    assert.equal((await c.db.query('SELECT state FROM amocrm_outbound_files')).rows[0].state,'unknown');
+    const op=(await c.db.query("UPDATE send_operations SET state='dispatching' RETURNING id")).rows[0].id;
+    await assert.rejects(()=>resolver({companyId:'c1',conversationId:c.conversation,operationId:op,
+      media:{type:'document',url:'https://amojo.amocrm.ru/attachments/synthetic',fileName:'test.txt',mimeType:'text/plain',sizeBytes:4}}),/outbound_media_upload_unknown/);
+    assert.equal(uploads,1);
+  }finally{await c.close();}
 });

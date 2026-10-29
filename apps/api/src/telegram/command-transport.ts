@@ -98,7 +98,7 @@ function validateCommand(command: TelegramCommand): CommandOutcome | null {
       if (!file || !(file.bytes instanceof Uint8Array) || file.bytes.length === 0) {
         return { outcome: 'failed', code: 'missing_file' };
       }
-      if (file.bytes.length > MAX_MEDIA_BYTES) {
+      if (file.bytes.length > (mediaType === 'photo' ? 10 * 1024 * 1024 : MAX_MEDIA_BYTES)) {
         return { outcome: 'failed', code: 'media_too_large' };
       }
       if (typeof file.fileName !== 'string' || file.fileName.length === 0) {

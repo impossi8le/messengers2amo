@@ -21,6 +21,8 @@ import {outboundConnectionAllowed} from './platform/outbound-policy.ts';
 import {crmDriveMediaUrl} from './media/crm-drive-access.ts';
 import {crmAvatarUrl} from './media/crm-avatar-access.ts';
 import type {InboundMessageInput} from './integrations/amocrm/sync.ts';
+import {createOutboundMediaResolver} from './integrations/amocrm/outbound-media.ts';
+import {createAmoDriveReader} from './integrations/amocrm/drive-reader.ts';
 
 /**
  * Outbox worker. The API only accepts commands and commits them; this process is
@@ -58,6 +60,7 @@ const mediaArchive = mediaStorage ? new OutboundQueue({
   db,schema,workerId,leaseMs,jobKinds:[TELEGRAM_MEDIA_JOB_KIND],dispatch:media.archiveMessage,
 }) : null;
 let crmOwnerResolver:CrmOwnerResolver|undefined;
+let outboundMediaResolver:ReturnType<typeof createOutboundMediaResolver>|undefined;
 
 /**
  * The CRM projection queue. Without a complete amoCRM configuration there is
@@ -81,6 +84,10 @@ function buildProjectionQueue(): OutboundQueue | null {
   });
   const ownerScope={accountDomain:amocrm.accountDomain,getAccessToken:(input:{companyId:string;accountId:string})=>oauth.accessToken(input),fetch:globalThis.fetch};
   crmOwnerResolver=createCrmOwnerResolver({findOpenLeads:createAmocrmSyncClient(ownerScope).findOpenLeads,readResponsible:createAmocrmWorkflowClient(ownerScope).readResponsible});
+  outboundMediaResolver=createOutboundMediaResolver({db,schema,files:createCrmFilesClient(ownerScope),
+    reader:createAmoDriveReader(ownerScope),getAccessToken:ownerScope.getAccessToken,fetch:globalThis.fetch,
+    resolveLead:async input=>{const leads=await createAmocrmSyncClient(ownerScope).findOpenLeads(input);
+      return leads.length===1?leads[0]!.id:null;}});
   const syncClient = createAmocrmSyncClient({
     accountDomain: amocrm.accountDomain,
     getAccessToken: (input) => oauth.accessToken(input),
@@ -216,6 +223,7 @@ async function runTelegramPass(): Promise<void> {
       transport,
       schema,
       resolveCrmOwner:crmOwnerResolver,
+      resolveMedia:outboundMediaResolver,
       outboundPolicy,
     });
     if (result.claimed > 0) {

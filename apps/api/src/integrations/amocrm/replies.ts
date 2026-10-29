@@ -5,6 +5,7 @@ import { raiseAlert } from '../../channels/alerts.ts';
 import { authorizeCrmChannelSend } from './directory-access.ts';
 import type { CrmOwnerResolver } from './directory-owner.ts';
 import {outboundScopeAllowed,type OutboundPolicy} from '../../platform/outbound-policy.ts';
+import { readCrmReplyContent } from './reply-content.ts';
 
 function record(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -53,6 +54,7 @@ export async function drainAmocrmReplies(
       const payload = record(event.payload);
       const envelope = record(payload?.message);
       const message = record(envelope?.message);
+      const content = message ? readCrmReplyContent(message) : null;
       const conversation = record(envelope?.conversation);
       const messageId = typeof message?.id === 'string' ? message.id : null;
       const clientId = typeof conversation?.client_id === 'string' ? conversation.client_id : null;
@@ -123,13 +125,7 @@ export async function drainAmocrmReplies(
         route?.allowed &&
         authorized && actorId &&
         messageId &&
-        message?.type === 'text' &&
-        typeof message.text === 'string' &&
-        message.text.length > 0 &&
-        message.text.length <= 4096 &&
-        quoteValid && !message.forwards &&
-        !message.media &&
-        !message.markup
+        content && quoteValid
       ) {
         const command = await acceptSendCommandInTransaction(
           tx,
@@ -144,7 +140,7 @@ export async function drainAmocrmReplies(
             actorId,
             workItemId: route.work_item_id,
             conversationId: route.conversation_id,
-            content: { text: message.text,...(replyToMessageId?{replyToMessageId}:{}) },
+            content: { ...content,...(replyToMessageId?{replyToMessageId}:{}) },
             deadlineSeconds: 3600,
           },
         );

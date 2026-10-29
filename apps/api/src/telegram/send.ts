@@ -8,6 +8,8 @@ import type { TelegramTransport, TransportOutcome } from './transport.ts';
 import { authorizeCrmChannelSend } from '../integrations/amocrm/directory-access.ts';
 import type { CrmOwnerResolver } from '../integrations/amocrm/directory-owner.ts';
 import {outboundConnectionAllowed,outboundScopeAllowed,type OutboundPolicy} from '../platform/outbound-policy.ts';
+import { readStoredCrmReplyContent } from '../integrations/amocrm/reply-content.ts';
+import { OutboundMediaError, type OutboundFile, type OutboundMediaReference } from '../integrations/amocrm/outbound-media.ts';
 
 export type SendCommand = {
   commandType: string;
@@ -46,6 +48,7 @@ export type WorkerOptions = {
   schema?: string;
   resolveCrmOwner?:CrmOwnerResolver;
   outboundPolicy?:OutboundPolicy;
+  resolveMedia?: (input: { companyId: string; conversationId: string; operationId: string; media: OutboundMediaReference }) => Promise<OutboundFile>;
 };
 
 export type WorkerResult = {
@@ -245,6 +248,8 @@ type DispatchTarget = {
   conversationId: string;
   externalChatId: string;
   text: string;
+  media?: OutboundMediaReference;
+  preparedFile?: OutboundFile;
   deadlineExpired: boolean;
   authorized: boolean;
   connectionId:string;
@@ -261,10 +266,11 @@ async function loadDispatchTarget(tx: Tx, companyId: string, operationId: string
     conversation_id: string;
     external_chat_id: string;
     text: string | null;
+    content: unknown;
     deadline_expired: boolean;
     actor_id:string;connection_id:string;binding_epoch:string;current_binding_epoch:string;created_at:Date;reply_to_message_id:string|null;quote_allowed:boolean;
   }>(
-    `SELECT o.state, o.conversation_id, c.external_chat_id, o.content->>'text' AS text,o.actor_id,o.connection_id,
+    `SELECT o.state, o.conversation_id, c.external_chat_id, o.content,o.content->>'text' AS text,o.actor_id,o.connection_id,
             o.binding_epoch,c.binding_epoch AS current_binding_epoch,o.created_at,
             o.content->>'replyToMessageId' AS reply_to_message_id,
             (NOT (o.content ? 'replyToMessageId') OR EXISTS(SELECT 1 FROM messages qm
@@ -276,14 +282,17 @@ async function loadDispatchTarget(tx: Tx, companyId: string, operationId: string
     [companyId, operationId],
   );
   const row = rows[0];
-  if (!row || typeof row.text !== 'string') return null;
+  if (!row) return null;
+  const content = readStoredCrmReplyContent(row.content);
+  if (!content) return null;
   const schema=(await tx.query<{schema:string}>('SELECT current_schema() AS schema')).rows[0]!.schema;
   const access=await authorizeCrmChannelSend(tx,schema,{companyId,connectionId:row.connection_id,conversationId:row.conversation_id,staffId:row.actor_id,resolveOwner});
   return {
     state: row.state,
     conversationId: row.conversation_id,
     externalChatId: row.external_chat_id,
-    text: row.text,
+    text: content.text,
+    media: content.media,
     deadlineExpired: row.deadline_expired,
     authorized:access.allowed,
     connectionId:row.connection_id,bindingEpoch:Number(row.binding_epoch),currentBindingEpoch:Number(row.current_binding_epoch),createdAt:row.created_at,
@@ -384,7 +393,11 @@ async function completeAttempt(
         await tx.query(
           `INSERT INTO message_versions (company_id, message_id, content_version, content, observed_at)
            VALUES ($1,$2,1,$3::jsonb,now())`,
-          [options.companyId, messageId, JSON.stringify({ kind: 'text', text: target.text })],
+          [options.companyId, messageId, JSON.stringify(target.media ? { kind: 'attachment', text: target.text,
+            outboundMedia: { type: target.media.type, fileName: target.preparedFile?.fileName ?? target.media.fileName,
+              mimeType: target.preparedFile?.mimeType ?? target.media.mimeType,
+              sizeBytes: target.preparedFile?.bytes.byteLength ?? target.media.sizeBytes, operationId: job.operationId } }
+            : { kind: 'text', text: target.text })],
         );
       }
       const savedMessage=messageId??(await tx.query<{id:string}>(`SELECT id FROM messages WHERE company_id=$1 AND conversation_id=$2 AND provider_message_id=$3 AND direction='out'`,
@@ -604,6 +617,9 @@ export async function runSendWorker(db: Db, options: WorkerOptions): Promise<Wor
         WHERE company_id=$1 AND id=$2 AND fence=$3 AND lease_owner=$4`,[options.companyId,job.id,job.fence,options.owner]);
       return {kind:'policy' as const,target:null,attempt:null};
     }
+    if (target.media) await tx.query(`UPDATE outbox_jobs SET lease_until=GREATEST(lease_until,now()+interval '180 seconds')
+      WHERE company_id=$1 AND id=$2 AND fence=$3 AND lease_owner=$4 AND state='leased'`,
+      [options.companyId,job.id,job.fence,options.owner]);
     const attempt = await beginAttempt(tx, options.companyId, job);
     if (target.deadlineExpired) {
       await failDeadline(tx, options, job, attempt);
@@ -629,12 +645,47 @@ export async function runSendWorker(db: Db, options: WorkerOptions): Promise<Wor
     return result;
   }
 
-  let outcome: TransportOutcome;
+  let outcome: TransportOutcome = { outcome: 'failed', code: 'media_preparation_failed' };
   try {
-    outcome = prepared.target.authorized&&prepared.target.quoteAllowed&&outboundScopeAllowed(policy,{companyId:options.companyId,connectionId:prepared.target.connectionId,
-      bindingEpoch:prepared.target.bindingEpoch,conversationId:prepared.target.conversationId,createdAt:prepared.target.createdAt}) ? await options.transport.sendMessage({ chatId: prepared.target.externalChatId, text: prepared.target.text,
-        ...(prepared.target.replyToMessageId?{replyToMessageId:prepared.target.replyToMessageId}:{}) }) :
-      {outcome:'failed',code:'channel_access_denied'};
+    const target = prepared.target;
+    const allowed = target.authorized && target.quoteAllowed && outboundScopeAllowed(policy, {companyId:options.companyId,
+      connectionId:target.connectionId,bindingEpoch:target.bindingEpoch,conversationId:target.conversationId,createdAt:target.createdAt});
+    if (!allowed) outcome = {outcome:'failed',code:'channel_access_denied'};
+    else if (!target.media) outcome = await options.transport.sendMessage({chatId:target.externalChatId,text:target.text,
+      ...(target.replyToMessageId ? {replyToMessageId:target.replyToMessageId} : {})});
+    else if (!options.resolveMedia || !options.transport.sendMedia) outcome = {outcome:'failed',code:'media_not_configured'};
+    else {
+      // No database transaction spans external file I/O. This is preparation,
+      // not a Telegram call; a resolver failure is a definitive unsent result.
+      let file: OutboundFile | undefined;
+      try { file = await options.resolveMedia({companyId:options.companyId,conversationId:target.conversationId,
+        operationId:job.operationId,media:target.media}); }
+      catch (error) { outcome = {outcome:'failed',code:error instanceof OutboundMediaError ? error.code : 'media_preparation_failed'}; }
+      if (file) {
+        target.preparedFile = file;
+        const current = await withTransaction(db, async tx => {
+          const owned = await tx.query(`SELECT 1 FROM outbox_jobs j JOIN send_operations o ON o.company_id=j.company_id AND o.id=$6
+            JOIN conversations c ON c.company_id=o.company_id AND c.id=o.conversation_id
+            JOIN connections n ON n.company_id=c.company_id AND n.id=c.connection_id
+            WHERE j.company_id=$1 AND j.id=$2 AND j.fence=$3 AND j.lease_owner=$4 AND j.state='leased' AND j.lease_until>now()
+              AND o.state='dispatching' AND o.deadline>now() AND c.id=$5 AND c.binding_epoch=o.binding_epoch
+              AND n.binding_epoch=c.binding_epoch AND n.send_enabled AND n.state IN ('active','degraded')
+              AND channel_crm_import_allowed(c.company_id,c.connection_id,c.binding_epoch,c.external_chat_id,c.chat_kind)`,
+            [options.companyId,job.id,job.fence,options.owner,target.conversationId,job.operationId]);
+          if (owned.rowCount !== 1) return null;
+          return loadDispatchTarget(tx,options.companyId,job.operationId,options.resolveCrmOwner);
+        });
+        if (!current?.authorized || !current.quoteAllowed || current.deadlineExpired || current.externalChatId !== target.externalChatId ||
+          current.bindingEpoch !== current.currentBindingEpoch || !outboundScopeAllowed(policy,{companyId:options.companyId,
+            connectionId:current.connectionId,bindingEpoch:current.bindingEpoch,conversationId:current.conversationId,createdAt:current.createdAt})) {
+          outcome = {outcome:'failed',code:'channel_access_denied'};
+        } else {
+          // The only delivery attempt; ambiguous provider outcomes never resend.
+          outcome = await options.transport.sendMedia({chatId:target.externalChatId,mediaType:target.media.type as 'photo'|'document',
+            file,caption:target.text || undefined,...(target.replyToMessageId ? {replyToMessageId:target.replyToMessageId} : {})});
+        }
+      }
+    }
   } catch {
     outcome = { outcome: 'unknown', reason: 'network' };
   }

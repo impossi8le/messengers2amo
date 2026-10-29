@@ -1,3 +1,4 @@
+import { createTelegramCommandTransport } from './command-transport.ts';
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
 export type SendMessageInput = {
@@ -14,6 +15,8 @@ export type TransportOutcome =
 
 export type TelegramTransport = {
   sendMessage: (input: SendMessageInput) => Promise<TransportOutcome>;
+  sendMedia?: (input: { chatId: string; mediaType: 'photo' | 'document';
+    file: { bytes: Uint8Array; fileName: string; mimeType: string }; caption?: string; replyToMessageId?: string }) => Promise<TransportOutcome>;
 };
 
 export type TransportOptions = {
@@ -45,8 +48,13 @@ export function createTelegramTransport(options: TransportOptions): TelegramTran
   if (!options.botToken) throw new Error('telegram_bot_token_required');
   const endpoint = `${base.toString().replace(/\/+$/, '')}/bot${options.botToken}/sendMessage`;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const commands = createTelegramCommandTransport({...options,timeoutMs:options.timeoutMs??60_000});
 
   return {
+    async sendMedia(input) {
+      const outcome = await commands.execute({ commandType: 'send_media', ...input });
+      return outcome.outcome === 'applied' ? { outcome: 'unknown', reason: 'malformed' } : outcome;
+    },
     async sendMessage(input: SendMessageInput): Promise<TransportOutcome> {
       const body: Record<string, unknown> = {
         chat_id: input.chatId,
