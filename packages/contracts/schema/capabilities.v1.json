@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "channelMode": "telegram_bot",
+      "scope": "local-prototype",
+      "capabilities": {
+        "textReply": "supported",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "telegram_personal",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "telegram_business",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "whatsapp_cloud",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "whatsapp_qr",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "max_bot",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    },
+    {
+      "channelMode": "vk_community",
+      "scope": "unverified",
+      "capabilities": {
+        "textReply": "unknown",
+        "mediaReply": "unknown",
+        "readReceipts": "unknown",
+        "deliveryReceipts": "unknown",
+        "messageEditing": "unknown",
+        "messageDeletion": "unknown"
+      }
+    }
+  ]
+}

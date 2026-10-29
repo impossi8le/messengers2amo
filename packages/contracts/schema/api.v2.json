@@ -1,0 +1,5452 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Internal Messenger Operator and Adapter API v2",
+    "version": "2.0.0",
+    "description": "Route map of the implemented v2 API. Operator and internal CRM paths use staffSession or adapterService security; auth, OAuth and channel webhook paths override it explicitly."
+  },
+  "security": [
+    {
+      "staffSession": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "staffSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "staff_session"
+      },
+      "adapterService": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Dedicated internal adapter service identity; never use operator cookie for internal CRM ingestion."
+      },
+      "adminBootstrapToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "One-time ADMIN_BOOTSTRAP_TOKEN that may create the first administrator of a company. The route exists only while the deployment configures the token; clear it once an administrator exists."
+      }
+    }
+  },
+  "paths": {
+    "/api/v2/operator/work-items": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItemList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/work-items/{id}": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/work-items/{id}/messages": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items_messages",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/MessageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/connections": {
+      "get": {
+        "operationId": "_api_v2_operator_connections_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionProjectionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "_api_v2_operator_connections_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionProjection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/ConnectionSetupRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/send-operations/{id}": {
+      "get": {
+        "operationId": "get__api_v1_operator_send-operations",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/work-items/{id}/snapshot": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_snapshot",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ComposeSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/EmptyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/work-items/{id}/claim": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_claim",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ClaimRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/work-items/{id}/transfer": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_transfer",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/TransferRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/work-items/{id}/reply": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_reply",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/SendReplyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/work-items/{id}/manual-coverage": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_manual-coverage",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ManualCoverageRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/work-items/{id}/resolve": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_resolve",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ResolveRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/connections/{id}/health": {
+      "get": {
+        "operationId": "_api_v2_operator_connections_id_health_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionProjection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/connections/{id}/lifecycle": {
+      "post": {
+        "operationId": "_api_v2_operator_connections_id_lifecycle_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionProjection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/ConnectionLifecycleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/connections/{id}/credentials-reference": {
+      "post": {
+        "operationId": "_api_v2_operator_connections_id_credentials-reference_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionProjection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/ConnectionCredentialRotationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/internal/crm/outbound": {
+      "post": {
+        "operationId": "_api_v2_internal_crm_outbound_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/CrmOutboundCommand"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adapterService": []
+          }
+        ]
+      }
+    },
+    "/api/v2/internal/crm/bindings": {
+      "get": {
+        "operationId": "_api_v2_internal_crm_bindings_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/CrmBindingList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adapterService": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "_api_v2_internal_crm_bindings_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/CrmBinding"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/CrmBindingRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adapterService": []
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/media/uploads": {
+      "post": {
+        "operationId": "_api_v2_operator_media_uploads_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/MediaUploadAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/MediaUploadRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/media/{id}/access": {
+      "get": {
+        "operationId": "_api_v2_operator_media_id_access_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/MediaAccessGrant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/media/{id}": {
+      "get": {
+        "operationId": "_api_v2_operator_media_id_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/MediaAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/work-items/{id}/attachment-reply": {
+      "post": {
+        "operationId": "_api_v2_operator_work-items_id_attachment-reply_post",
+        "responses": {
+          "202": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/AttachmentReplyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/staff/availability": {
+      "get": {
+        "operationId": "_api_v2_operator_staff_availability_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/StaffAvailabilityList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/staff/{id}/availability": {
+      "post": {
+        "operationId": "_api_v2_operator_staff_id_availability_post",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/StaffAvailability"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/StaffAvailabilityRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/notifications": {
+      "get": {
+        "operationId": "_api_v2_operator_notifications_get",
+        "responses": {
+          "200": {
+            "description": "Contract success; not proof of external delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/NotificationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/media/{id}/content": {
+      "put": {
+        "operationId": "uploadReservedMediaBytes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Bytes accepted into quarantine; not yet ready to send",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/MediaAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "downloadAuthorizedMediaBytes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session-authorized active media grant, ready asset only",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Request rejected; safe code and internal request ID only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/workshops": {
+      "get": {
+        "operationId": "_api_v2_operator_workshops_get",
+        "description": "Lists workshops visible to the session. Requires role read. A workshop-scoped session sees only its own workshop; a company-level session sees all.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WorkshopList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "_api_v2_operator_workshops_post",
+        "description": "Creates or upserts a workshop by id (the id is the identity; idempotencyKey is accepted but never changes the outcome). Requires role admin. A workshop-scoped session may only submit its own workshop id; any other id is 404.",
+        "responses": {
+          "201": {
+            "description": "Workshop created or upserted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WorkshopView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop id outside the session scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/WorkshopCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/workshops/{id}/routes": {
+      "get": {
+        "operationId": "_api_v2_operator_workshops_id_routes_get",
+        "description": "Lists connection routes assigned to the workshop. Requires role read. A foreign or missing workshop is 404.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionRouteList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Path parameter failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop not found or outside the session scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "_api_v2_operator_workshops_id_routes_post",
+        "description": "Creates or updates the route of a connection inside the workshop. Requires role admin. The route of a connection belongs to one workshop: moving it through another workshop endpoint is 404. A stale expectedVersion is 409 with x-current-version and x-route-version headers.",
+        "responses": {
+          "200": {
+            "description": "Route stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ConnectionRouteView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Path parameter or body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop, connection, or route scope not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "VERSION_CONFLICT: expectedVersion is stale; the current version is in x-current-version and x-route-version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "x-current-version": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "x-route-version": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/ConnectionRouteRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/workshops/{id}/groups": {
+      "get": {
+        "operationId": "_api_v2_operator_workshops_id_groups_get",
+        "description": "Lists group policy rules of the workshop. Requires role read. Optional connectionId must be routed to this workshop, otherwise 404.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/GroupRuleList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Path parameter or query failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop or routed connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "connectionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "bindingEpoch",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "_api_v2_operator_workshops_id_groups_post",
+        "description": "Sets the group policy rule for one external chat. Requires role manage. The connection must be routed to this workshop, otherwise 404.",
+        "responses": {
+          "200": {
+            "description": "Rule stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/GroupRuleView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Path parameter or body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop or routed connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/GroupRuleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/workshops/{id}/permissions": {
+      "get": {
+        "operationId": "_api_v2_operator_workshops_id_permissions_get",
+        "description": "Lists per-connection staff permissions inside the workshop. Requires role read. Optional connectionId must be routed to this workshop, otherwise 404.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WorkshopPermissionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Path parameter or query failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workshop or routed connection not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "connectionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/crm/policy": {
+      "get": {
+        "operationId": "_api_v2_operator_crm_policy_get",
+        "description": "Returns the assignment policy (source of truth) and its version. Requires role read. Absence of a stored row is the documented default: platform, version 0.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/AssignmentPolicy"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "_api_v2_operator_crm_policy_post",
+        "description": "Changes the assignment policy with compare-and-set. Requires role admin. A stale expectedVersion is 409 with x-current-version and x-policy-version headers; the error body stays a plain ApiError.",
+        "responses": {
+          "200": {
+            "description": "Policy stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/AssignmentPolicy"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "VERSION_CONFLICT: expectedVersion is stale; the current version is in x-current-version and x-policy-version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "x-current-version": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "x-policy-version": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/AssignmentPolicyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/crm/conflicts": {
+      "get": {
+        "operationId": "_api_v2_operator_crm_conflicts_get",
+        "description": "Lists open assignment conflicts, optionally narrowed by account and conversation. Requires role read. A conversation or account outside the session scope is 404.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/CrmAssignmentConflictList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Query failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conversation or account not found or outside the session scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "conversationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/operator/crm/resync": {
+      "post": {
+        "operationId": "_api_v2_operator_crm_resync_post",
+        "description": "Requests a CRM synchronization for one conversation. Requires role manage. Account and conversation must be visible in the session scope, otherwise 404. idempotencyKey makes a replay return the stored result.",
+        "responses": {
+          "200": {
+            "description": "Sync attempt recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/CrmResyncResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account or conversation not found or outside the session scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "VERSION_CONFLICT: concurrent modification, retry the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/CrmResyncRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/operator/crm/diagnostics": {
+      "get": {
+        "operationId": "_api_v2_operator_crm_diagnostics_get",
+        "description": "Returns sync state, owner projection, open conflict count, binding summary and the linked-card URL for one conversation. Requires role read. accountId and conversationId are mandatory; a foreign scope is 404.",
+        "responses": {
+          "200": {
+            "description": "Contract success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/CrmDiagnostics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Query failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session role is below read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account or conversation not found or outside the session scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "conversationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/auth/login": {
+      "post": {
+        "operationId": "_api_v2_auth_login_post",
+        "description": "Authenticates a staff member and issues the staff_session cookie. No session is required. Attempts are throttled per IP/company/staff before any password check; a blocked attempt is 429 with retry-after, and password-check capacity exhaustion is 503 RATE_LIMITED.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Session issued; the staff_session cookie is set and the response must not be cached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/LoginResponse"
+                }
+              }
+            },
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "cache-control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: unknown company/staff or wrong password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMITED: too many attempts; retry-after carries the delay in seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "retry-after": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "RATE_LIMITED: password-check capacity is busy; retry-after is 1 second",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "retry-after": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/bootstrap": {
+      "post": {
+        "operationId": "_api_v2_auth_bootstrap_post",
+        "description": "Creates the first administrator of a company and its staff grant. Requires Authorization: Bearer ADMIN_BOOTSTRAP_TOKEN; when the token is not configured the route is not registered and answers 404. The company is created when absent. The call is accepted at most once per company: a company that already has an administrator answers 409 and nothing is changed. The password and its hash never appear in the response or the logs.",
+        "security": [
+          {
+            "adminBootstrapToken": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Administrator created; the response carries identifiers only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "companyId",
+                    "staffId",
+                    "role"
+                  ],
+                  "properties": {
+                    "companyId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63
+                    },
+                    "staffId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 63
+                    },
+                    "role": {
+                      "const": "admin"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: missing or wrong bootstrap token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "VERSION_CONFLICT: the company already has an administrator; nothing was changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "companyId",
+                  "staffId",
+                  "password"
+                ],
+                "properties": {
+                  "companyId": {
+                    "type": "string",
+                    "pattern": "^[a-z_][a-z0-9_]{0,62}$"
+                  },
+                  "staffId": {
+                    "type": "string",
+                    "pattern": "^[a-z_][a-z0-9_]{0,62}$"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 12,
+                    "maxLength": 200
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/logout": {
+      "post": {
+        "operationId": "_api_v2_auth_logout_post",
+        "description": "Revokes the current session and clears the staff_session cookie. Requires a verified session; the request body must be empty when present.",
+        "responses": {
+          "204": {
+            "description": "Session revoked and the staff_session cookie cleared",
+            "headers": {
+              "set-cookie": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No verified staff session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/LogoutRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/integrations/amocrm/oauth/authorize": {
+      "get": {
+        "operationId": "_api_v2_integrations_amocrm_oauth_authorize_get",
+        "description": "Starts the amoCRM OAuth flow and redirects to the provider. Authorized either by an admin staff session or, for first-time setup before any staff account exists, by the one-time setup token passed as the setup query parameter. Without either, 401.",
+        "security": [
+          {
+            "staffSession": []
+          },
+          {}
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to the amoCRM authorization page",
+            "headers": {
+              "location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHENTICATED: neither an admin session nor a valid setup token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "UPSTREAM_UNAVAILABLE: the provider authorization URL could not be built",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "setup",
+            "in": "query",
+            "required": false,
+            "description": "One-time setup token; compared in constant time with the configured value",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/integrations/amocrm/oauth/callback": {
+      "get": {
+        "operationId": "_api_v2_integrations_amocrm_oauth_callback_get",
+        "description": "OAuth redirect target. No session is required. Exchanges code/state for tokens and renders an HTML result page; a missing or rejected code is a 400 HTML page, not an ApiError.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "HTML page: tokens received and stored encrypted",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "HTML page: code/state missing, rejected or expired",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "description": "Authorization code from amoCRM; validated at runtime",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "OAuth state from amoCRM; validated at runtime",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/integrations/amocrm/oauth/revoke": {
+      "post": {
+        "operationId": "_api_v2_integrations_amocrm_oauth_revoke_post",
+        "description": "Revokes the stored amoCRM OAuth tokens for the session company. Requires role admin.",
+        "responses": {
+          "200": {
+            "description": "Tokens revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/OAuthRevokeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN: no session or role below admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "UPSTREAM_UNAVAILABLE: the provider revocation call failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/telegram/{connectionId}": {
+      "post": {
+        "operationId": "_webhooks_telegram_connectionId_post",
+        "description": "Telegram Bot API update webhook. No staff session: the request is authenticated only by x-telegram-bot-api-secret-token, compared in constant time with the configured webhook secret. Unknown connections and connections of another channel are both 404.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Update stored or recognized as a duplicate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/TelegramWebhookAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_update: body failed the update schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: missing or wrong secret header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "connection_not_found: no such connection or it is not a Telegram channel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ambiguous_connection or payload_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "telegram_not_configured: no webhook secret is configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "x-telegram-bot-api-secret-token",
+            "in": "header",
+            "required": true,
+            "description": "Secret token configured for the Telegram webhook",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v2.json#/$defs/TelegramUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/whatsapp/{connectionId}": {
+      "post": {
+        "operationId": "_webhooks_whatsapp_connectionId_post",
+        "description": "WhatsApp Cloud API webhook. No staff session: the exact received bytes must carry a valid x-hub-signature-256 HMAC (sha256=<hex>) computed with the app secret. Verification precedes any database access.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Events stored; duplicates are reported separately",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ChannelWebhookAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_update: malformed payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: missing or invalid signature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "connection_not_found: no such connection or it is not a WhatsApp channel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ambiguous_connection or payload_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds the 1 MiB webhook limit; rejected before parsing (framework error shape)"
+          },
+          "503": {
+            "description": "whatsapp_not_configured: WhatsApp is not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "x-hub-signature-256",
+            "in": "header",
+            "required": true,
+            "description": "HMAC-SHA256 of the exact request bytes, formatted as sha256=<hex>",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "_webhooks_whatsapp_connectionId_get",
+        "description": "Meta subscription handshake. No session and no database access: the challenge is echoed only when hub.mode=subscribe and hub.verify_token equals the configured verify token.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The hub.challenge value echoed as text",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "missing_challenge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "invalid_subscription_request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "whatsapp_not_configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "hub.mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hub.verify_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hub.challenge",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/webhooks/max/{connectionId}": {
+      "post": {
+        "operationId": "_webhooks_max_connectionId_post",
+        "description": "MAX Bot API webhook. No staff session: authenticated only by x-max-bot-api-secret, compared with the configured webhook secret.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Events stored; duplicates are reported separately",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ChannelWebhookAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_update: malformed payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: missing or wrong secret header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "connection_not_found: no such connection or it is not a MAX channel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ambiguous_connection or payload_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds the 1 MiB webhook limit; rejected before parsing (framework error shape)"
+          },
+          "503": {
+            "description": "max_not_configured: MAX is not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "x-max-bot-api-secret",
+            "in": "header",
+            "required": true,
+            "description": "Secret configured for the MAX webhook",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/vk/{connectionId}": {
+      "post": {
+        "operationId": "_webhooks_vk_connectionId_post",
+        "description": "VK Callback API webhook. No staff session: the secret is a body field compared with the configured secret. A confirmation event is answered with text/plain before any database access; other events are stored and acknowledged as JSON.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Confirmation code as text, or stored-events JSON",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/ChannelWebhookAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_update: malformed payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: missing or wrong body secret",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "connection_not_found: no such connection or it is not a VK channel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ambiguous_connection or payload_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds the 1 MiB webhook limit; rejected before parsing (framework error shape)"
+          },
+          "503": {
+            "description": "vk_not_configured: VK is not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "secret": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "_webhooks_vk_connectionId_get",
+        "description": "VK Callback API confirmation handshake. No session: the confirmation code is returned only for type=confirmation and an existing VK connection.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The configured confirmation code",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "invalid_confirmation_request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "connection_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ambiguous_connection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "vk_not_configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "connectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/webhooks/amocrm/{scopeId}": {
+      "post": {
+        "operationId": "_webhooks_amocrm_scopeId_post",
+        "description": "amoCRM Chats webhook. No staff session: x-signature is verified over the exact received bytes with the channel secret before JSON parsing. Unknown or disabled scopes and bad signatures are deliberately indistinguishable (401). The durable inbox write is awaited before the 202 because amoCRM does not redeliver.",
+        "security": [],
+        "responses": {
+          "202": {
+            "description": "Event accepted or recognized as a duplicate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/AmocrmWebhookAccepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_payload: body is not a JSON object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "invalid_signature: unknown/disabled scope or bad signature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "scope_mismatch: account_id does not match the channel account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body exceeds the 1 MiB webhook limit; rejected before parsing (framework error shape)"
+          },
+          "503": {
+            "description": "channel_secret_unavailable or storage_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v2.json#/$defs/WebhookError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scopeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "x-signature",
+            "in": "header",
+            "required": true,
+            "description": "Provider signature of the exact request bytes",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Локальный Telegram</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-layout" id="appLayout">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="header-title">Локальный Telegram</h1>
+      </div>
+      <div class="header-right">
+        <span id="demoBadge" class="badge badge-demo" hidden>Demo</span>
+        <span id="statusBadge" class="badge badge-muted">Подключение...</span>
+        <button id="demoIncomingBtn" class="btn btn-sm btn-outline" hidden>+ Смоделировать входящее</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar" id="sidebar" aria-label="Список чатов">
+        <div class="search-box">
+          <input type="search" id="chatSearch" placeholder="Поиск чатов..." aria-label="Поиск по чатам">
+        </div>
+        <div class="chat-list" id="chatList" role="list"></div>
+      </aside>
+
+      <main class="chat-view" id="chatView">
+        <div id="noChatSelected" class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h2>Выберите чат</h2>
+          <p id="emptyStateHelp">Напишите боту в Telegram и отправьте <code>/start</code></p>
+          <a id="botLink" href="#" target="_blank" rel="noopener noreferrer" class="bot-link" hidden>Написать боту</a>
+        </div>
+
+        <div id="activeChat" class="chat-container" hidden>
+          <div class="chat-header">
+            <button id="backBtn" class="btn-icon back-btn" aria-label="Назад к списку чатов">←</button>
+            <div class="chat-avatar" id="activeChatAvatar"></div>
+            <div class="chat-meta">
+              <div class="chat-title" id="activeChatTitle"></div>
+              <div class="chat-subtitle" id="activeChatSubtitle"></div>
+            </div>
+          </div>
+
+          <div class="message-list" id="messageList" role="log" aria-live="polite"></div>
+
+          <div class="chat-composer">
+            <div id="composerError" class="composer-error" hidden></div>
+            <div class="composer-form">
+              <textarea id="composerInput" placeholder="Написать сообщение... (Enter — отправить, Shift+Enter — перенос)" maxlength="4096" rows="1" aria-label="Текст сообщения"></textarea>
+              <button id="sendBtn" class="btn btn-primary" aria-label="Отправить">Отправить</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

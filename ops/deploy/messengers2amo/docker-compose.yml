@@ -1,0 +1,221 @@
+# messengers2amo — isolated production Compose project.
+#
+# Host: Ubuntu 24.04, 2 vCPU / ~4.8 GB RAM, no swap, existing nginx on 80/443
+# shared with unrelated projects (dzen, geo, map, pogodafon, litellm,
+# neurowriter, lr-messenger). Therefore:
+#   * the project name is fixed, so volumes/containers/network cannot collide;
+#   * the only published port is loopback 127.0.0.1:18767 (nginx proxies to it);
+#   * PostgreSQL is never published to the host;
+#   * no privileged mode, no host networking, no docker.sock, no foreign paths.
+#
+# Start:   docker compose -p messengers2amo up -d
+#           (`migrate` runs first and must exit 0 before `api` starts)
+# Migrate: docker compose -p messengers2amo run --rm migrate   (manual re-run)
+#
+# TODO(release): pin image digests for `postgres` and the built `api` image in
+# RELEASE-MANIFEST.md before the first rollout.
+
+name: messengers2amo
+
+services:
+  # -------------------------------------------------------------------------
+  # API (Fastify). The only externally reachable process, via loopback only.
+  # -------------------------------------------------------------------------
+  api:
+    build:
+      context: ../../..
+      dockerfile: apps/api/Dockerfile
+    image: messengers2amo/api:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3000"
+      # Overrides whatever (possibly empty) DATABASE_URL is present in .env.
+      # Password must be URL-safe; see .env.example.
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      # Loopback only. nginx (already on the host) terminates TLS and proxies here.
+      - "127.0.0.1:18767:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - internal
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+          pids: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # -------------------------------------------------------------------------
+  # PostgreSQL 18. Never published to the host; reachable only on `internal`.
+  # -------------------------------------------------------------------------
+  postgres:
+    # TODO(release): pin by digest, e.g. postgres:18@sha256:<digest>.
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set in .env}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+      TZ: UTC
+    volumes:
+      # PostgreSQL 18+ images declare VOLUME /var/lib/postgresql and use a
+      # version-specific PGDATA (/var/lib/postgresql/18/docker). Mounting the
+      # parent directory is the supported layout; do NOT mount .../data here.
+      - pgdata:/var/lib/postgresql
+    networks:
+      - internal
+    # PostgreSQL needs shared memory for parallel query / large sorts.
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" -h 127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 768M
+          pids: 200
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # -------------------------------------------------------------------------
+  # One-shot schema migration. Runs on every `up` and is idempotent: the
+  # runner compares the ledger (version + name + sha256 checksum) and applies
+  # only missing migrations under a PostgreSQL advisory lock. `api` starts only
+  # after this service exits 0. Manual re-run:
+  #   docker compose -p messengers2amo run --rm migrate
+  # -------------------------------------------------------------------------
+  migrate:
+    build:
+      context: ../../..
+      dockerfile: apps/api/Dockerfile
+    image: messengers2amo/api:${IMAGE_TAG:-local}
+    restart: "no"
+    command: ["node", "ops/deploy/messengers2amo/migrate-entrypoint.mjs"]
+    env_file:
+      - .env
+    environment:
+      M2A_SCHEMA: ${M2A_SCHEMA:-messengers2amo}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+          pids: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # -------------------------------------------------------------------------
+  # Outbox worker. The only process that calls a provider, so an accepted command
+  # is executed exactly once even if the API restarts. No published ports: it is
+  # reachable only through the internal network and the database.
+  # -------------------------------------------------------------------------
+  worker:
+    build:
+      context: ../../..
+      dockerfile: apps/api/Dockerfile
+    image: messengers2amo/api:${IMAGE_TAG:-local}
+    command: ["node", "apps/api/src/worker.ts"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      WORKER_ID: ${WORKER_ID:-worker-1}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - internal
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    # The image healthcheck probes the API's HTTP port, which the worker never
+    # serves; inheriting it reports a running worker as permanently unhealthy.
+    healthcheck:
+      disable: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    stop_grace_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+          pids: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  internal:
+    name: messengers2amo_internal
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: messengers2amo_pgdata

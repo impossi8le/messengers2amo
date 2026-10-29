@@ -1,0 +1,110 @@
+name: Security
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Weekly, so newly disclosed advisories surface even without a commit.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Dependency audit. Non-blocking on purpose: a high advisory in a transitive
+  # dev dependency must be visible in the run, but must not freeze delivery.
+  # The job is still reported as failed in the UI when npm audit exits non-zero.
+  # ---------------------------------------------------------------------------
+  audit:
+    name: npm audit (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - apps/api
+          - apps/web
+          - packages/contracts
+          - packages/observability
+          - packages/database
+          - packages/amocrm-protocol
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ${{ matrix.package }}/package-lock.json
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  # ---------------------------------------------------------------------------
+  # Committed-secret scan. Blocking: a leaked key in the tree is a real
+  # incident, not a warning. Scans tracked files only, so untracked local .env
+  # files (ignored by .gitignore) are out of scope by design.
+  # ---------------------------------------------------------------------------
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan tracked files for secret patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=0
+
+          # This workflow necessarily contains the patterns themselves.
+          excludes=(':!.github/workflows/security.yml')
+
+          scan() {
+            local label="$1"
+            local pattern="$2"
+            local hits
+            hits=$(git grep -nIE -- "$pattern" -- . "${excludes[@]}" || true)
+            if [ -n "$hits" ]; then
+              echo "::error title=Possible committed secret: $label::Found matches for $label"
+              echo "$hits"
+              status=1
+            fi
+          }
+
+          scan "private key" '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+          scan "Slack token" 'xox[baprs]-[A-Za-z0-9-]{10,}'
+          scan "GitHub token" 'gh[pousr]_[A-Za-z0-9]{20,}'
+          scan "AWS access key id" 'AKIA[0-9A-Z]{16}'
+
+          if [ "$status" -ne 0 ]; then
+            echo "Secret scan failed. Remove the value from the tree and rotate it;"
+            echo "deleting the commit is not enough once it has been pushed."
+            exit 1
+          fi
+          echo "No secret patterns found in tracked files."
+
+      - name: Verify no ops/deploy .env file is tracked
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked=$(git ls-files ops/deploy \
+            | grep -E '(^|/)\.env(\.|$)' \
+            | grep -vE '(^|/)\.env\.example$' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error title=Tracked environment file::ops/deploy must never track a real .env file"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "No tracked .env files under ops/deploy (only .env.example is allowed)."

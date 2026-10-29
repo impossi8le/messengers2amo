@@ -1,0 +1,87 @@
+name: Project checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test Telegram prototype without credentials
+        run: npm --prefix local-telegram test
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install contract validator without lifecycle scripts
+        run: npm --prefix packages/contracts ci --ignore-scripts
+      - name: Validate versioned project contracts
+        run: npm --prefix packages/contracts test
+
+  observability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm --prefix packages/observability ci --ignore-scripts
+      - run: npm --prefix packages/observability test
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: wazzup_test
+          POSTGRES_PASSWORD: ci-only-wazzup
+          POSTGRES_DB: wazzup_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U wazzup_test -d wazzup_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DB_TEST_ALLOW: '1'
+      DB_TEST_URL: postgresql://wazzup_test:ci-only-wazzup@127.0.0.1:5432/wazzup_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm --prefix packages/database ci --ignore-scripts
+      - name: Migration and backup protocol unit tests
+        run: npm --prefix packages/database test
+      - name: Real PostgreSQL 18 migration tests
+        run: npm --prefix packages/database run test:integration
+      - name: Domain persistence invariants on PostgreSQL 18
+        run: npm --prefix packages/database run test:domain
+      - name: Restore synthetic backup with PostgreSQL 18 tools
+        env:
+          DB_RESTORE_CONTAINER: ${{ job.services.postgres.id }}
+        run: npm --prefix packages/database run test:backup
+
+  amocrm-protocol:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm --prefix packages/amocrm-protocol ci --ignore-scripts
+      - run: npm --prefix packages/amocrm-protocol test

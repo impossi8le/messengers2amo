@@ -1,0 +1,30 @@
+.env
+.env.*
+!.env.example
+!.env.demo
+**/data/
+**/logs/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+node_modules/
+coverage/
+playwright-report/
+work/
+outputs/
+.claude/
+
+# Local publication and provider artifacts
+*.local-*
+*.pem
+*.p12
+*.pfx
+*.session
+**/tdata/
+**/sessions/
+
+# Local SSH handoff package; publish only the sanitized ops/deploy documents.
+/messengers.example.com/
+**/keys/dzen_server_ed25519*

@@ -1,0 +1,86 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: var(--space-1);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
+  /* position: relative удерживает прокрутку таблицы внутри обёртки:
+     без него браузер расширяет scrollWidth всей страницы. */
+  position: relative;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+
+  th,
+  td {
+    text-align: left;
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: var(--surface-muted);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.load {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.loadBar {
+  display: inline-block;
+  width: 72px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.loadFill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 20px;
+  }
+}

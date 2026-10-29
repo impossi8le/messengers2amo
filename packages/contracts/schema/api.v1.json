@@ -1,0 +1,1302 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Internal messenger operator API — proposed",
+    "version": "1.0.0"
+  },
+  "security": [
+    {
+      "staffSession": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "staffSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "staff_session"
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/operator/work-items": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItemList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/operator/work-items/{id}": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/operator/work-items/{id}/messages": {
+      "get": {
+        "operationId": "get__api_v1_operator_work-items_messages",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/MessageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/operator/connections": {
+      "get": {
+        "operationId": "get__api_v1_operator_connections",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ConnectionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/send-operations/{id}": {
+      "get": {
+        "operationId": "get__api_v1_operator_send-operations",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/operator/work-items/{id}/snapshot": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_snapshot",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ComposeSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/EmptyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/work-items/{id}/claim": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_claim",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ClaimRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/work-items/{id}/transfer": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_transfer",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/TransferRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/work-items/{id}/reply": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_reply",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/SendOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/SendReplyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/work-items/{id}/manual-coverage": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_manual-coverage",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ManualCoverageRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/operator/work-items/{id}/resolve": {
+      "post": {
+        "operationId": "post__api_v1_operator_work-items_resolve",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/WorkItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error; authorize before disclosing resource state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "v1.json#/$defs/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "v1.json#/$defs/ResolveRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

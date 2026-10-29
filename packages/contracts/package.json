@@ -1,0 +1,17 @@
+{
+  "name": "@internal/messenger-contracts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Production contracts schema, tests, and documentation for internal messenger",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "private": true,
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  }
+}

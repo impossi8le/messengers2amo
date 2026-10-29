@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Type checking. Deliberately NOT continue-on-error: a type error must fail
+  # the pipeline. Fix the code, do not soften the check.
+  # ---------------------------------------------------------------------------
+  typecheck:
+    name: Typecheck (apps/api)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - name: Install dependencies
+        run: npm --prefix apps/api ci --ignore-scripts --no-audit --no-fund
+      - name: Typecheck
+        run: npm --prefix apps/api run typecheck
+
+  # ---------------------------------------------------------------------------
+  # Full API test suite against a real PostgreSQL 18. The migration test is the
+  # only proof that the SQL migrations apply cleanly and are idempotent, so the
+  # database is a service container rather than a mock.
+  # ---------------------------------------------------------------------------
+  test:
+    name: Tests (apps/api + PostgreSQL 18)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: m2a
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d m2a"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      TEST_DATABASE_URL: postgresql://testuser:testpass@127.0.0.1:5432/m2a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - name: Install dependencies
+        run: npm --prefix apps/api ci --ignore-scripts --no-audit --no-fund
+      - name: Run tests
+        run: npm --prefix apps/api test
+
+  # ---------------------------------------------------------------------------
+  # Database domain suite against a real PostgreSQL 18: migration immutability
+  # and domain invariants. Runs the package's opt-in DB tests in CI.
+  # ---------------------------------------------------------------------------
+  database-domain:
+    name: Domain tests (packages/database + PostgreSQL 18)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: wazzup_test
+          POSTGRES_PASSWORD: wazzup_test_pw
+          POSTGRES_DB: wazzup_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U wazzup_test -d wazzup_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DB_TEST_ALLOW: '1'
+      DB_TEST_URL: postgresql://wazzup_test:wazzup_test_pw@127.0.0.1:5432/wazzup_test
+    defaults:
+      run:
+        working-directory: packages/database
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: packages/database/package-lock.json
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run domain tests
+        run: npm run test:domain
+
+  # ---------------------------------------------------------------------------
+  # Web app: production build (which includes `tsc --noEmit`) and Vitest.
+  # ---------------------------------------------------------------------------
+  web:
+    name: Web (build + Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+
+  # ---------------------------------------------------------------------------
+  # Node packages: contracts, observability, database, amocrm-protocol.
+  # Each has its own lockfile and test script.
+  # ---------------------------------------------------------------------------
+  packages:
+    name: Package ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - contracts
+          - observability
+          - database
+          - amocrm-protocol
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: packages/${{ matrix.package }}/package-lock.json
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Test
+        run: npm test

@@ -1,0 +1,37 @@
+# messengers2amo — backup schedule (RPO 1 hour)
+#
+# This file is a /etc/cron.d drop-in (it carries the `root` user column).
+# Install on the production host:
+#   install -d -m 0700 /opt/messengers2amo/backups
+#   install -m 0644 -o root -g root \
+#     /opt/messengers2amo/src/ops/deploy/messengers2amo/scripts/messengers2amo-backup.cron \
+#     /etc/cron.d/messengers2amo-backup
+#   systemctl reload cron    # or: service cron reload
+#   ls -l /etc/cron.d/messengers2amo-backup
+#
+# Verify after the first hour:
+#   tail -n 20 /var/log/messengers2amo-backup.log
+#   /opt/messengers2amo/src/ops/deploy/messengers2amo/scripts/backup-freshness.sh
+#
+# No env file is sourced: the scripts derive everything from their own defaults
+# and the compose project name, so nothing secret is stored in this crontab.
+#
+# Minute 7 keeps the dump off the top of the hour, away from the metrics scrape
+# and the outbox sweeper.
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+BACKUP_SCRIPT=/opt/messengers2amo/src/ops/deploy/messengers2amo/scripts/backup.sh
+FRESHNESS_SCRIPT=/opt/messengers2amo/src/ops/deploy/messengers2amo/scripts/backup-freshness.sh
+BACKUP_LOG=/var/log/messengers2amo-backup.log
+
+# Hourly dump, every hour at :07 UTC. Retention: newest 72 hourly dumps (3 days).
+7 * * * * root BACKUP_LEVEL=hourly "$BACKUP_SCRIPT" >> "$BACKUP_LOG" 2>&1
+
+# Daily dump at 03:07 UTC, taken in addition to the hourly one at that minute.
+# Retention: newest 14 daily dumps (14 days).
+7 3 * * * root BACKUP_LEVEL=daily "$BACKUP_SCRIPT" >> "$BACKUP_LOG" 2>&1
+
+# RPO guard: exits non-zero when the newest dump is older than 65 minutes.
+# Wire the exit code into the monitoring system; it writes to the same log.
+22 * * * * root "$FRESHNESS_SCRIPT" >> "$BACKUP_LOG" 2>&1

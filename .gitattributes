@@ -1,0 +1,15 @@
+# Shell scripts must keep LF on every platform: a CRLF byte at the end of a line
+# makes bash read `set -euo pipefail\r` and abort with
+# "set: pipefail: invalid option name" — exactly how the restore rehearsal failed
+# on the server after the code was packaged on Windows.
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Container and CI definitions are read verbatim.
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# SQL migrations are checksummed into the ledger. Keep them LF so a Windows and a
+# Linux checkout produce identical bytes.
+*.sql text eol=lf

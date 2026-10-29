@@ -1,0 +1,1996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://internal.messenger.local/schemas/v2.json",
+  "title": "Internal messenger contract library v2",
+  "description": "Validate named definitions; v1 is frozen. Normalized events major2.",
+  "$defs": {
+    "EventPayloadNativeOutbound": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversationId",
+        "messageId",
+        "providerMessageId",
+        "contentVersion",
+        "content",
+        "authorKind",
+        "coverage"
+      ],
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "providerMessageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "contentVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "authorKind": {
+          "enum": [
+            "human",
+            "automation",
+            "unknown"
+          ]
+        },
+        "coverage": {
+          "const": "unconfirmed"
+        },
+        "content": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/MessageContent"
+        }
+      }
+    },
+    "EventPayloadDeliveryObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversationId",
+        "messageId",
+        "providerMessageId",
+        "operationId",
+        "attemptId",
+        "observedAt",
+        "evidenceKey",
+        "status"
+      ],
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "providerMessageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "operationId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "attemptId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidenceKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "status": {
+          "enum": [
+            "delivered",
+            "failed"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operationId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "operationId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "attemptId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "attemptId"
+            ]
+          }
+        }
+      ]
+    },
+    "EventPayloadReadObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversationId",
+        "messageId",
+        "providerMessageId",
+        "operationId",
+        "attemptId",
+        "observedAt",
+        "evidenceKey",
+        "status"
+      ],
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "providerMessageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "operationId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "attemptId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidenceKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "status": {
+          "const": "read"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operationId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "operationId"
+            ]
+          },
+          "then": {
+            "properties": {
+              "attemptId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "attemptId"
+            ]
+          }
+        }
+      ]
+    },
+    "EventEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "connectionId",
+        "bindingEpoch",
+        "providerEventKey",
+        "occurredAt",
+        "receivedAt",
+        "kind",
+        "payload"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "integer",
+          "const": 2
+        },
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connectionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bindingEpoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "providerEventKey": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "message.received",
+            "message.edited",
+            "message.deleted",
+            "send.result",
+            "assignment.changed",
+            "message.outbound_observed",
+            "message.delivery_observed",
+            "message.read_observed"
+          ]
+        },
+        "payload": {
+          "type": "object"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "message.received"
+            },
+            "payload": {
+              "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/EventPayloadMessageReceived"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "message.edited"
+            },
+            "payload": {
+              "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/EventPayloadMessageEdited"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "message.deleted"
+            },
+            "payload": {
+              "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/EventPayloadMessageDeleted"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "send.result"
+            },
+            "payload": {
+              "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/EventPayloadSendResult"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "assignment.changed"
+            },
+            "payload": {
+              "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/EventPayloadAssignmentChanged"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "message.outbound_observed"
+            },
+            "payload": {
+              "$ref": "#/$defs/EventPayloadNativeOutbound"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "message.delivery_observed"
+            },
+            "payload": {
+              "$ref": "#/$defs/EventPayloadDeliveryObserved"
+            }
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "message.read_observed"
+            },
+            "payload": {
+              "$ref": "#/$defs/EventPayloadReadObserved"
+            }
+          }
+        }
+      ]
+    },
+    "ConnectionHealth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkedAt",
+        "lastInboundAt",
+        "lastSuccessAt",
+        "errorCode"
+      ],
+      "properties": {
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastInboundAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "lastSuccessAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "errorCode": {
+          "enum": [
+            null,
+            "AUTH_REQUIRED",
+            "POLLING_CONFLICT",
+            "UPSTREAM_TIMEOUT",
+            "UPSTREAM_UNAVAILABLE",
+            "CONFIGURATION_REQUIRED",
+            "INTERNAL_ERROR"
+          ]
+        }
+      }
+    },
+    "ConnectionProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "state",
+        "version",
+        "bindingEpoch",
+        "credentialsVersion",
+        "ingressEnabled",
+        "sendEnabled",
+        "health",
+        "channelMode",
+        "capabilities"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "state": {
+          "enum": [
+            "setup",
+            "active",
+            "degraded",
+            "auth_required",
+            "paused",
+            "disabled"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bindingEpoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "credentialsVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ingressEnabled": {
+          "type": "boolean"
+        },
+        "sendEnabled": {
+          "type": "boolean"
+        },
+        "health": {
+          "$ref": "#/$defs/ConnectionHealth"
+        },
+        "channelMode": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/ChannelMode"
+        },
+        "capabilities": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/Capabilities"
+        }
+      }
+    },
+    "ConnectionLifecycleRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "expectedVersion",
+        "desiredState"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "desiredState": {
+          "enum": [
+            "active",
+            "paused",
+            "disabled"
+          ]
+        }
+      }
+    },
+    "ConnectionSetupRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "channelMode",
+        "credentialRef"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "channelMode": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/ChannelMode"
+        },
+        "credentialRef": {
+          "type": "string",
+          "pattern": "^credref_[A-Za-z0-9_-]{1,128}$"
+        }
+      }
+    },
+    "ConnectionCredentialRotationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "expectedVersion",
+        "credentialRef"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "credentialRef": {
+          "type": "string",
+          "pattern": "^credref_[A-Za-z0-9_-]{1,128}$"
+        }
+      }
+    },
+    "CrmOutboundCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "crmEventId",
+        "crmBindingId",
+        "idempotencyKey",
+        "text",
+        "coverage"
+      ],
+      "properties": {
+        "crmEventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "crmBindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "coverage": {
+          "const": "unconfirmed"
+        }
+      }
+    },
+    "CrmBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conversationId",
+        "crmAccountId",
+        "contactId",
+        "leadId",
+        "chatId",
+        "version",
+        "state"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "crmAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "contactId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "leadId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "chatId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "bound",
+            "creation_unknown",
+            "disabled"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "bound"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "contactId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "chatId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CrmBindingRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "conversationId",
+        "crmAccountId",
+        "contactId",
+        "leadId",
+        "chatId",
+        "expectedVersion"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "crmAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "contactId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "leadId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "chatId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "MediaUploadRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "displayName",
+        "mimeType",
+        "sizeBytes"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[^\\r\\n]+$"
+        },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 127,
+          "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 104857600
+        }
+      }
+    },
+    "MediaAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "state",
+        "displayName",
+        "mimeType",
+        "sizeBytes",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "state": {
+          "enum": [
+            "pending_upload",
+            "quarantined",
+            "ready",
+            "rejected"
+          ]
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "mimeType": {
+          "type": "string",
+          "maxLength": 127
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "MediaUploadAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset",
+        "uploadPath",
+        "expiresAt"
+      ],
+      "properties": {
+        "asset": {
+          "$ref": "#/$defs/MediaAsset"
+        },
+        "uploadPath": {
+          "type": "string",
+          "pattern": "^/api/v2/media/[A-Za-z0-9_-]+/content$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "MediaAccessGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaId",
+        "expiresAt",
+        "downloadPath"
+      ],
+      "properties": {
+        "mediaId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "downloadPath": {
+          "type": "string",
+          "pattern": "^/api/v2/media/[A-Za-z0-9_-]+/content$"
+        }
+      }
+    },
+    "AttachmentReplyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "snapshotId",
+        "expectedAssignmentVersion",
+        "selectedObligations",
+        "mediaIds",
+        "caption",
+        "deadline"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedAssignmentVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectedObligations": {
+          "type": "array",
+          "items": {
+            "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/ObligationRef"
+          },
+          "uniqueItems": true
+        },
+        "mediaIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "StaffAvailability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "availability",
+        "departmentIds",
+        "capacity",
+        "activeCount",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "away",
+            "offline"
+          ]
+        },
+        "departmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "activeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "StaffAvailabilityRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "idempotencyKey",
+        "expectedVersion",
+        "availability"
+      ],
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "away",
+            "offline"
+          ]
+        }
+      }
+    },
+    "Notification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "notificationId",
+        "kind",
+        "workItemId",
+        "resourceVersion",
+        "cursor",
+        "resyncRequired"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "notificationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "kind": {
+          "enum": [
+            "work_item.changed",
+            "connection.changed",
+            "operation.changed",
+            "resync_required"
+          ]
+        },
+        "workItemId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "resourceVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "resyncRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ConnectionProjectionList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "page"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectionProjection"
+          }
+        },
+        "page": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/Page"
+        }
+      }
+    },
+    "CrmBindingList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "page"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmBinding"
+          }
+        },
+        "page": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/Page"
+        }
+      }
+    },
+    "StaffAvailabilityList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "page"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StaffAvailability"
+          }
+        },
+        "page": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/Page"
+        }
+      }
+    },
+    "NotificationList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "page"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Notification"
+          }
+        },
+        "page": {
+          "$ref": "https://internal.messenger.local/schemas/v1.json#/$defs/Page"
+        }
+      }
+    },
+    "WorkshopView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        }
+      }
+    },
+    "WorkshopList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WorkshopView"
+          }
+        }
+      }
+    },
+    "WorkshopCreateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "ConnectionRouteView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionId",
+        "workshopId",
+        "crmAccountId",
+        "funnelId",
+        "defaultOwnerId",
+        "technicalSourceId",
+        "version"
+      ],
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "workshopId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "crmAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "funnelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "defaultOwnerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "technicalSourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ConnectionRouteList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConnectionRouteView"
+          }
+        }
+      }
+    },
+    "ConnectionRouteRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionId",
+        "crmAccountId",
+        "funnelId",
+        "defaultOwnerId",
+        "technicalSourceId",
+        "expectedVersion"
+      ],
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "crmAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "funnelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "defaultOwnerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "technicalSourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "GroupRuleView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionId",
+        "bindingEpoch",
+        "externalChatId",
+        "decision",
+        "displayName",
+        "version"
+      ],
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingEpoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "externalChatId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "decision": {
+          "enum": [
+            "allow_crm",
+            "exclude",
+            "archive_only"
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "GroupRuleList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GroupRuleView"
+          }
+        }
+      }
+    },
+    "GroupRuleRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionId",
+        "bindingEpoch",
+        "externalChatId",
+        "decision"
+      ],
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingEpoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "externalChatId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "decision": {
+          "enum": [
+            "allow_crm",
+            "exclude",
+            "archive_only"
+          ]
+        },
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        }
+      }
+    },
+    "WorkshopPermission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionId",
+        "staffId",
+        "canRead",
+        "canSend"
+      ],
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "canRead": {
+          "type": "boolean"
+        },
+        "canSend": {
+          "type": "boolean"
+        }
+      }
+    },
+    "WorkshopPermissionList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WorkshopPermission"
+          }
+        }
+      }
+    },
+    "AssignmentPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceOfTruth",
+        "version"
+      ],
+      "properties": {
+        "sourceOfTruth": {
+          "enum": [
+            "crm",
+            "platform"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "AssignmentPolicyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceOfTruth",
+        "expectedVersion"
+      ],
+      "properties": {
+        "sourceOfTruth": {
+          "enum": [
+            "crm",
+            "platform"
+          ]
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "CrmAssignmentConflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "accountId",
+        "conversationId",
+        "crmOwnerRef",
+        "platformOwnerId",
+        "desiredCrmOwnerRef",
+        "policy",
+        "winner",
+        "state",
+        "detectedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "crmOwnerRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "platformOwnerId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "desiredCrmOwnerRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "winner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "detectedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "CrmAssignmentConflictList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmAssignmentConflict"
+          }
+        }
+      }
+    },
+    "CrmResyncRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accountId",
+        "conversationId",
+        "idempotencyKey"
+      ],
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "CrmResyncResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "replayed",
+        "leadId",
+        "crmOwnerRef",
+        "errorCode"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ok",
+            "lead_missing",
+            "failed"
+          ]
+        },
+        "replayed": {
+          "type": "boolean"
+        },
+        "leadId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "crmOwnerRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "CrmSyncState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "errorCode",
+        "lastAttemptAt",
+        "lastSuccessAt",
+        "result"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ok",
+            "lead_missing",
+            "failed"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "lastAttemptAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastSuccessAt": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "result": {
+          "type": "object"
+        }
+      }
+    },
+    "CrmOwnerProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "desiredOwnerRef",
+        "projectedOwnerRef",
+        "state"
+      ],
+      "properties": {
+        "desiredOwnerRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "projectedOwnerRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "CrmBindingSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accountId",
+        "contactId",
+        "leadId",
+        "chatId",
+        "state"
+      ],
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "contactId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "leadId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "chatId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "CrmDiagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sync",
+        "leadMissing",
+        "projection",
+        "openConflicts",
+        "binding",
+        "cardUrl"
+      ],
+      "properties": {
+        "sync": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmSyncState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "leadMissing": {
+          "type": "boolean"
+        },
+        "projection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmOwnerProjection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "openConflicts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "binding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmBindingSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cardUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "companyId",
+        "staffId",
+        "password"
+      ],
+      "properties": {
+        "companyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "password": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "LoginResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "staffId",
+        "companyId",
+        "role",
+        "workshopId",
+        "expiresAt"
+      ],
+      "properties": {
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "companyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "role": {
+          "enum": [
+            "read",
+            "send",
+            "manage",
+            "admin"
+          ]
+        },
+        "workshopId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "LogoutRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 0
+    },
+    "OAuthRevokeResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "const": "revoked"
+        }
+      }
+    },
+    "TelegramUpdate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "update_id"
+      ],
+      "properties": {
+        "update_id": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "TelegramWebhookAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "duplicate"
+      ],
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "duplicate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ChannelWebhookAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "duplicate",
+        "accepted",
+        "duplicates"
+      ],
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "duplicate": {
+          "type": "boolean"
+        },
+        "accepted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicates": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "AmocrmWebhookAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "accepted",
+            "duplicate"
+          ]
+        }
+      }
+    },
+    "WebhookError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "enum": [
+            "invalid_update",
+            "unauthorized",
+            "connection_not_found",
+            "ambiguous_connection",
+            "payload_conflict",
+            "telegram_not_configured",
+            "whatsapp_not_configured",
+            "max_not_configured",
+            "vk_not_configured",
+            "invalid_subscription_request",
+            "missing_challenge",
+            "invalid_confirmation_request",
+            "invalid_signature",
+            "invalid_payload",
+            "scope_mismatch",
+            "channel_secret_unavailable",
+            "storage_unavailable"
+          ]
+        }
+      }
+    }
+  }
+}

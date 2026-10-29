@@ -1,0 +1,66 @@
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--space-6) 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.brandMark {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #6a4fb0);
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: var(--space-1);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.submit {
+  align-self: flex-start;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: var(--space-3) 0;
+  }
+
+  .card {
+    padding: var(--space-4);
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .submit {
+    align-self: stretch;
+  }
+}

@@ -1,0 +1,124 @@
+# Prometheus alert rules for messengers2amo.
+#
+# TEMPLATE, NOT A DEPLOYED SYSTEM: no Prometheus/Alertmanager is provisioned by
+# this repository. Wire this file into a real Prometheus first — see
+# monitoring/README.md.
+#
+# Expected scrape job names (see monitoring/README.md):
+#   messengers2amo            — the /metrics endpoint (bearer token)
+#   messengers2amo-readiness  — blackbox_exporter probing /health/ready
+#
+# All m2a_* series are gauges recomputed per scrape; they are not counters.
+# Thresholds are pilot-sized starting points and must be reviewed after the
+# first week of real traffic.
+
+groups:
+  - name: messengers2amo
+    rules:
+      # The scrape fails when the process is down, when nginx cannot reach the
+      # upstream, or when the database queries behind /metrics fail. All three
+      # are "the service is not observable and probably not serving".
+      - alert: M2A_API_DOWN
+        expr: up{job="messengers2amo"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: messengers2amo
+        annotations:
+          summary: "messengers2amo /metrics is not reachable"
+          description: >-
+            Prometheus has failed to scrape {{ $labels.instance }} for more than
+            2 minutes. Either the API container is down, nginx cannot reach
+            127.0.0.1:18767, or the database behind /metrics is unavailable.
+            Check `docker compose -p messengers2amo ps`, then
+            `docker compose -p messengers2amo logs --tail=100 api postgres`,
+            then /health/ready. Do not restart-loop on a database failure.
+
+      # Readiness needs an active probe: the application does not export a
+      # readiness metric. This rule assumes blackbox_exporter (module http_2xx).
+      # Without blackbox, a database outage still surfaces as M2A_API_DOWN,
+      # because /metrics itself runs SELECT queries.
+      - alert: M2A_NOT_READY
+        expr: probe_success{job="messengers2amo-readiness"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: messengers2amo
+        annotations:
+          summary: "messengers2amo reports not ready (database dependency)"
+          description: >-
+            /health/ready has failed for {{ $labels.instance }} for more than
+            2 minutes, which means `SELECT 1` against PostgreSQL fails.
+            Inspect `docker compose -p messengers2amo logs postgres`, disk
+            space, connection limits and container health. The API stays up on
+            purpose; do not restart it on readiness alone.
+
+      - alert: M2A_OUTBOX_OVERDUE
+        expr: m2a_outbox_overdue_jobs{job="messengers2amo"} > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: messengers2amo
+        annotations:
+          summary: "Outbox jobs overdue for more than 10 minutes"
+          description: >-
+            {{ $value }} pending outbox jobs became available more than five
+            minutes ago and are still not dispatched. The queue is not moving:
+            dispatcher stopped, worker crashed, or the database is slow.
+            Check m2a_outbox_jobs{state="leased"} and expired leases with the
+            read-only SQL in MONITORING.md section 3.2.
+
+      # Any unknown send outcome is a manual-reconciliation event: the provider
+      # may or may not have delivered the message. Never retry automatically.
+      - alert: M2A_SEND_UNKNOWN
+        expr: m2a_send_operations{job="messengers2amo",state="unknown"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: messengers2amo
+        annotations:
+          summary: "Send operations in unknown state require manual reconciliation"
+          description: >-
+            {{ $value }} send operations have an unknown provider outcome. The
+            message may or may not have been delivered. Do not retry: reconcile
+            against the provider (receipt, read-back, webhook) or escalate to
+            the operator, as described in ROLLBACK.md section 5. Inspect the
+            rows with the read-only SQL in MONITORING.md section 3.3.
+
+      - alert: M2A_INBOX_FAILED
+        expr: m2a_inbox_events{job="messengers2amo",state="failed"} > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: messengers2amo
+        annotations:
+          summary: "More than 5 inbound events failed processing"
+          description: >-
+            {{ $value }} inbound events are in state failed. Ingest is losing
+            messages or a handler is rejecting valid payloads. Read the failure
+            reason in the API logs (correlation id is logged), fix the cause,
+            then replay deliberately. Quarantined events are a separate,
+            manual-review state.
+
+      # Growth matters more than the absolute number: a pilot queue that is
+      # stable at 30 open obligations is not the same as one growing steadily.
+      # deriv() is per second: 0.005/s is roughly 0.3 obligations per minute,
+      # i.e. 18 per hour of unchecked inflow.
+      - alert: M2A_OPEN_OBLIGATIONS_HIGH
+        expr: >-
+          m2a_open_obligations{job="messengers2amo"} > 25
+          and
+          deriv(m2a_open_obligations{job="messengers2amo"}[30m]) > 0.005
+        for: 30m
+        labels:
+          severity: warning
+          service: messengers2amo
+        annotations:
+          summary: "Unanswered obligation queue is high and growing"
+          description: >-
+            {{ $value }} obligations are open (inbound messages waiting for a
+            reply) and the queue has been rising for 30 minutes. Either staff
+            are not answering or the outbound send path is broken. Check the
+            send pipeline metrics (m2a_send_operations, m2a_outbox_overdue_jobs)
+            before assuming a staffing problem. Threshold 25 is a placeholder:
+            tune it to the pilot SLA.

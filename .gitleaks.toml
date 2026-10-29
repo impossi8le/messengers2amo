@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Synthetic test key and identifiers; fixed contract definition hashes"
+condition = "AND"
+paths = ['''(?:^|/)apps/api/test/telegram-setup\.test\.ts$''', '''(?:^|/)packages/contracts/test/(?:contracts\.test\.mjs|next\.test\.mjs|fixtures/v1-definition-hashes\.json)$''']
+regexTarget = "secret"
+regexes = ['''^0123456789abcdef0123456789abcdef$''', '''^credref_internal-1$''', '''^cmd-reply-1002$''', '''^[a-f0-9]{64}$''']
